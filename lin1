@@ -1,0 +1,123 @@
+#!/bin/sh
+
+# example usage:
+# ./lin1 c:/box/meta/ref/progbooks/lisp/Standard_LISP_report.pdf
+# ************************************
+
+
+all_args=("$@")
+
+input_file=$1
+option=$2
+
+remaining=${all_args[@]:2}
+
+echo "('All Arguments' => ${all_args[@]})"
+echo "('Remaining Arguments' => $remaining)"
+echo "--------------------------"
+# ************************************
+
+
+echo_paths() {
+    echo "dirname:$(dirname $0)"
+    echo "realpath: $(realpath $0)"
+    echo "pwd:$(pwd)"
+    echo "--------------------------"
+    echo "input_file->dirname: $(dirname $input_file)"
+    echo "input_file->realpath: $(realpath $input_file)"
+    desired_file=$input_file    
+    echo_file_props
+}
+
+echo_file_props() {
+    file_name=$(basename -- "$desired_file")
+    file_name_only="${file_name%.*}"
+    extension="${file_name##*.}"
+    echo "input_file->basename: $file_name"
+    echo "input_file->file_name_only: $file_name_only"
+    echo "input_file->extension: $extension"
+    echo "--------------------------"
+}
+
+create_report_folder() {
+    time_stamp="-($(LANG=en_us_88591; date +'%Y.%m.%d-%H.%M.%S'))"
+    time_stamp_folder=$(LANG=en_us_88591; date +'%Y.%B.%d')
+    time_stamp_folder="__($time_stamp_folder)__/"
+    rep_dir="$REPORT_PATH/$time_stamp_folder"
+
+    echo "Save directory is => '$rep_dir'"
+    if [ -d $rep_dir ]
+    then
+        echo "'$rep_dir' directory exists on your filesystem."
+        ls -la $rep_dir
+    else
+        echo "Creating directory -> $rep_dir..."
+        mkdir $rep_dir
+    fi
+    echo "--------------------------"
+}
+
+echo_args() {
+    while test $# -gt 0; do
+        case "$1" in
+            -h|--help)
+                echo "help"
+                ;;
+            *)
+                break
+                ;;
+            esac
+        shift
+        echo "next:$1"
+    done
+
+    if [ "heyt" == "huyt" ]; then
+        create_report_folder
+    fi
+
+    if [ 2 -eq 1 ]; then
+        sleep 3
+    fi
+}
+
+echo_paths
+echo_args
+# ************************************
+
+space_free=$( df -h | awk '{ print $5 }' | sort -n | tail -n 1 | sed 's/%//' )
+
+echo "space_free"
+echo "--------------------------"
+echo "$(df -h)"
+echo ""
+echo "$(df -h | awk '{ print $5 }')"
+echo ""
+echo "$(df -h | awk '{ print $5 }' | sort -n)"
+echo ""
+echo "$(df -h | awk '{ print $5 }' | sort -n | tail -n 1)"
+echo ""
+echo "$(df -h | awk '{ print $5 }' | sort -n | tail -n 1 | sed 's/%//')"
+echo ""
+
+case $space_free in
+    [1-5]*)
+        echo Plenty of disk space available
+        ;;
+    [6-7]*)
+        echo There could be a problem in the near future
+        ;;
+    8*)
+        echo Maybe we should look at clearing out old files
+        ;;
+    9*)
+        echo We could have a serious problem on our hands soon
+        ;;
+    *)
+        echo Something is not quite right here
+        ;;
+esac
+# ************************************
+
+
+exit
+

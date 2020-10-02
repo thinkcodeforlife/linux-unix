@@ -1,0 +1,51 @@
+makefile example
+
+Example
+Here is a makefile that describes the way an executable file called edit depends on four object files which,
+in turn, depend on four C source and two header files. To be concrete, edit is a target,
+edit.o, kbd.o, command.o and display.o are the objects we link to make the executable,
+defs.h and command.h are headers that our objects need to compile correctly,
+and $(CC) -c -o $@ $< $(CCFLAGS) is a system command.
+
+$@ is a macro that refers to the target
+$< is a macro that refers to the first dependency
+$^ is a macro that refers to all dependencies
+% is a macro to make a pattern that we want to watch in both the target and the dependency
+
+The make file will recompile all objects if any of the headers change, but if an individual .c file changes,
+the only work that will need to be done is to recompile that file and then relink all the objects. Well written make rules can help reduce compile time by detecting what did and did not change
+
+Notice the way the variables and static pattern rules are used to make the makefile more extensible and readable.
+We define the same, reusable rule to make each .o from each .c, and to make each target from the objects.
+
+Also notice that we can only link one main at a time, so we have to filter out other mains at linking.
+
+The targets all and clean are named .PHONY because they don't refer to real files,
+but are things we want make to do.
+
+__________________________________________________________________________________
+CC      := gcc
+CCFLAGS := 
+LDFLAGS :=
+
+TARGETS:= edit
+MAINS  := $(addsuffix .o, $(TARGETS) )
+OBJ    := kbd.o command.o display.o $(MAINS)
+DEPS   := defs.h command.h
+
+.PHONY: all clean
+
+all: $(TARGETS)
+
+clean:
+	rm -f $(TARGETS) $(OBJ)
+
+$(OBJ): %.o : %.c $(DEPS)
+	$(CC) -c -o $@ $< $(CCFLAGS)
+
+$(TARGETS): % : $(filter-out $(MAINS), $(OBJ)) %.o
+	$(CC) -o $@ $(LIBS) $^ $(CCFLAGS) $(LDFLAGS)
+__________________________________________________________________________________
+
+To use this makefile to create the executable file called edit, type "make all" or "make edit".
+To use this makefile to delete the executable file and all the object files from the directory, type "make clean".

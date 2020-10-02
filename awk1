@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# example usage:
+# ./awk1 "3 > 6" "print" "1" sample.data
+# ************************************
+all_args=("$@")
+
+pattern=$1
+action=$2
+field=$3
+input_file=$4
+
+echo "('All Arguments' => ${all_args[@]})"
+# ************************************
+
+awk_cmd="awk '\$$pattern { $action \$$field }' $input_file"
+
+echo "U run => $awk_cmd"
+
+eval $awk_cmd
+
+# awk '$3 > 6 { print $1 }' sample.data
+
+exit

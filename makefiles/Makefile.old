@@ -1,0 +1,3 @@
+den: den.c
+	gcc -Wall -g -o den den.c
+
